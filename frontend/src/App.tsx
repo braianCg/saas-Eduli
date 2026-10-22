@@ -6,6 +6,7 @@ import Products from './pages/Products';
 import Ganancias from './pages/Ganancias';
 import Facturas from './pages/Facturas';
 import Personal from './pages/Personal';
+import { SEO } from './SEO';
 
 function Shell() {
   const { user, logout } = useAuth();
@@ -15,7 +16,7 @@ function Shell() {
     <div className="shell">
       <aside className="side no-print">
         <div className="brand">{user.kiosk}</div>
-        <nav>
+        <nav aria-label="Navegación principal">
           <NavLink to="/caja">Caja</NavLink>
           <NavLink to="/productos">Inventario</NavLink>
           {owner && <NavLink to="/ganancias">Ganancias</NavLink>}
@@ -24,7 +25,7 @@ function Shell() {
         </nav>
         <button className="ghost on-dark" onClick={logout}>Salir · {user.name}</button>
       </aside>
-      <main className="main">
+      <main className="main" id="main-content">
         <Outlet />
       </main>
     </div>
@@ -38,18 +39,21 @@ function OwnerOnly() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route element={<Shell />}>
-        <Route path="/caja" element={<Pos />} />
-        <Route path="/productos" element={<Products />} />
-        <Route element={<OwnerOnly />}>
-          <Route path="/ganancias" element={<Ganancias />} />
-          <Route path="/facturas" element={<Facturas />} />
-          <Route path="/personal" element={<Personal />} />
+    <>
+      <SEO />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route element={<Shell />}>
+          <Route path="/caja" element={<Pos />} />
+          <Route path="/productos" element={<Products />} />
+          <Route element={<OwnerOnly />}>
+            <Route path="/ganancias" element={<Ganancias />} />
+            <Route path="/facturas" element={<Facturas />} />
+            <Route path="/personal" element={<Personal />} />
+          </Route>
         </Route>
-      </Route>
-      <Route path="*" element={<Navigate to="/caja" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/caja" replace />} />
+      </Routes>
+    </>
   );
 }
