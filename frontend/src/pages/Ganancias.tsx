@@ -5,9 +5,10 @@ import {
 import { api, money } from '../api';
 import { PAYMENT_LABELS, type Summary } from '../types';
 
-const NAVY = '#14213d';
-const GREEN = '#138a5c';
-const PIE = ['#14213d', '#e0a800', '#138a5c', '#c8372d', '#6b7a99'];
+const PRIMARY = '#0f172a';
+const ACCENT = '#2563eb';
+const GREEN = '#059669';
+const PIE = ['#0f172a', '#2563eb', '#059669', '#d97706', '#64748b'];
 
 const iso = (d: Date) => d.toLocaleDateString('sv-SE'); // YYYY-MM-DD en hora local
 
@@ -53,12 +54,12 @@ export default function Ganancias() {
         {data.daily.length === 0 ? <p className="muted">No hay ventas en este período.</p> : (
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={data.daily}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#d9dee7" />
-              <XAxis dataKey="d" tickFormatter={(v: string) => v.slice(5)} />
-              <YAxis tickFormatter={(v: number) => `$${Math.round(v / 1000)}k`} width={56} />
-              <Tooltip formatter={(v) => money(Number(v))} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="d" tickFormatter={(v: string) => v.slice(5)} stroke="#64748b" fontSize={12} />
+              <YAxis tickFormatter={(v: number) => `$${Math.round(v / 1000)}k`} width={56} stroke="#64748b" fontSize={12} />
+              <Tooltip formatter={(v) => money(Number(v))} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
               <Legend />
-              <Line type="monotone" dataKey="revenue" name="Ventas" stroke={NAVY} strokeWidth={2.5} dot={false} />
+              <Line type="monotone" dataKey="revenue" name="Ventas" stroke={PRIMARY} strokeWidth={2.5} dot={false} />
               <Line type="monotone" dataKey="profit" name="Ganancia" stroke={GREEN} strokeWidth={2.5} dot={false} />
             </LineChart>
           </ResponsiveContainer>
@@ -71,10 +72,10 @@ export default function Ganancias() {
           {data.top.length === 0 ? <p className="muted">Sin datos todavía.</p> : (
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={data.top} layout="vertical" margin={{ left: 8 }}>
-                <XAxis type="number" allowDecimals={false} />
-                <YAxis type="category" dataKey="name" width={130} />
-                <Tooltip />
-                <Bar dataKey="units" name="Unidades" fill={NAVY} radius={[0, 4, 4, 0]} />
+                <XAxis type="number" allowDecimals={false} stroke="#64748b" fontSize={12} />
+                <YAxis type="category" dataKey="name" width={130} stroke="#64748b" fontSize={12} />
+                <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                <Bar dataKey="units" name="Unidades" fill={ACCENT} radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
