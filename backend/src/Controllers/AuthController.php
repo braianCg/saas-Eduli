@@ -43,17 +43,68 @@ final class AuthController
         Http::json(self::session($uid, $tid, $name, 'owner', $kiosk), 201);
     }
 
+    private static function checkRateLimit(string $ip, string $email): void
+    {
+        $timeWindow = 15 * 60; // 15 minutos
+        $maxAttempts = 5;
+        $now = time();
+        $key = "{$ip}:{$email}";
+
+        // Limpiar intentos viejos
+        Db::exec('DELETE FROM login_attempts WHERE attempted_at < ?', [$now - $timeWindow]);
+
+        $attempts = (int)(Db::one(
+            'SELECT COUNT(*) as cnt FROM login_attempts WHERE ip_address = ? AND email = ? AND attempted_at >= ?',
+            [$ip, $email, $now - $timeWindow]
+        )['cnt'] ?? 0);
+
+        if ($attempts >= $maxAttempts) {
+            Http::fail(429, 'Demasiados intentos fallidos. Por favor, intentá nuevamente en 15 minutos.');
+        }
+    }
+
+    private static function recordFailedAttempt(string $ip, string $email): void
+    {
+        Db::exec(
+            'INSERT INTO login_attempts(ip_address, email, attempted_at) VALUES(?, ?, ?)',
+            [$ip, $email, time()]
+        );
+    }
+
+    private static function clearFailedAttempts(string $ip, string $email): void
+    {
+        Db::exec(
+            'DELETE FROM login_attempts WHERE ip_address = ? AND email = ?',
+            [$ip, $email]
+        );
+    }
+
     public static function login(array $p = []): void
     {
         $b = Http::body();
+        $email = strtolower(trim((string)($b['email'] ?? '')));
+        $password = (string)($b['password'] ?? '');
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+
+        if ($email === '' || $password === '') {
+            Http::fail(422, 'Ingresá email y contraseña');
+        }
+
+        self::checkRateLimit($ip, $email);
+
         $u = Db::one(
             'SELECT u.id, u.tenant_id, u.name, u.password_hash, u.role, t.name AS kiosk
              FROM users u JOIN tenants t ON t.id = u.tenant_id WHERE u.email = ?',
-            [strtolower(trim((string)($b['email'] ?? '')))]
+            [$email]
         );
-        if (!$u || !password_verify((string)($b['password'] ?? ''), $u['password_hash'])) {
+
+        if (!$u || !password_verify($password, $u['password_hash'])) {
+            self::recordFailedAttempt($ip, $email);
             Http::fail(401, 'Email o contraseña incorrectos');
         }
+
+        self::clearFailedAttempts($ip, $email);
+
         Http::json(self::session((int)$u['id'], (int)$u['tenant_id'], $u['name'], $u['role'], $u['kiosk']));
     }
 

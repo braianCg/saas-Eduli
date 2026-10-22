@@ -11,6 +11,13 @@ use App\Router;
 
 Env::load(__DIR__ . '/../.env');
 
+// Security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('X-XSS-Protection: 1; mode=block');
+
+// CORS configuration
 header('Access-Control-Allow-Origin: ' . Env::get('CORS_ORIGIN', 'http://localhost:5173'));
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
