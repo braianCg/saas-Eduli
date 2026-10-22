@@ -19,6 +19,15 @@ CREATE TABLE users (
   FOREIGN KEY (tenant_id) REFERENCES tenants(id)
 );
 
+-- Protección contra ataques de fuerza bruta en inicio de sesión
+CREATE TABLE login_attempts (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  ip_address VARCHAR(45) NOT NULL,
+  email VARCHAR(160) NOT NULL,
+  attempted_at INT UNSIGNED NOT NULL,
+  KEY idx_ip_email_time (ip_address, email, attempted_at)
+);
+
 CREATE TABLE products (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   tenant_id INT UNSIGNED NOT NULL,
