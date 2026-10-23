@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS kiosko CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE kiosko;
+CREATE DATABASE IF NOT EXISTS `eduli-base` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `eduli-base`;
 
 -- Cada kiosko es un "tenant". Todas las tablas llevan tenant_id para aislar los datos.
 CREATE TABLE tenants (

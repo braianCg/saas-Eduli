@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 spl_autoload_register(function (string $class): void {
     $file = __DIR__ . '/../src/' . str_replace('\\', '/', preg_replace('/^App\\\\/', '', $class)) . '.php';
     if (is_file($file)) require $file;
